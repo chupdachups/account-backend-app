@@ -1,0 +1,54 @@
+package com.msa.account.service;
+
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.msa.account.dto.AccountDto;
+import com.msa.account.entity.Account;
+import com.msa.account.entity.Role;
+import com.msa.account.exception.AccountNotFoundException;
+import com.msa.account.repository.AccountRepository;
+
+@Service
+@Transactional
+public class AccountService {
+
+	@Autowired
+	private AccountRepository accountRepository;
+
+	public Account create(AccountDto.SignUpReq dto) {
+		if(!accountRepository.findByEmail(dto.getEmail()).isEmpty())
+			throw new DuplicateKeyException(dto.getEmail());
+	    return accountRepository.save(dto.toEntity(Role.ROLE_USER));
+	}
+
+	@Transactional(readOnly = true)
+	public Account findByEmail(String email) {
+	    List<Account> accounts = accountRepository.findByEmail(email);
+	    if (accounts.isEmpty())
+	        throw new AccountNotFoundException(email);
+	    return accounts.get(0);
+	}
+	
+	public Account updateAccount(String email, AccountDto.UpdateAccountReq dto) {
+	    Account account = findByEmail(email);
+	    account.updateAccount(dto);
+	    return account;
+	}
+	
+	public List<Account> getAccounts() {
+		return accountRepository.findAll();
+	}
+	
+	public void deleteAccounts(List<AccountDto.DelReq> dtoList) {
+		accountRepository.deleteAllById((Iterable<? extends Long>) dtoList.stream().map(m -> m.getAccountId()).collect(Collectors.toList()));
+	}
+	
+	
+}
