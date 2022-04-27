@@ -47,25 +47,25 @@ public class AccountControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
-    @Test
-    @DisplayName("회원가입")
-    public void signUp() throws Exception {
-        //given
-        final AccountDto.SignUpReq dto = buildSignUpReq();
-        given(accountService.create(any())).willReturn(dto.toEntity());
-
-        //when
-        final ResultActions resultActions = requestSignUp(dto);
-
-        //then
-        resultActions
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.address.address1", is(dto.getAddress().getAddress1())))
-                .andExpect(jsonPath("$.address.zip", is(dto.getAddress().getZip())))
-                .andExpect(jsonPath("$.email", is(dto.getEmail())))
-                .andExpect(jsonPath("$.name.first", is(dto.getName().getFirst())))
-                .andExpect(jsonPath("$.name.last", is(dto.getName().getLast())));
-    }
+//    @Test
+//    @DisplayName("회원가입")
+//    public void signUp() throws Exception {
+//        //given
+//        final AccountDto.SignUpReq dto = buildSignUpReq();
+//        given(accountService.create(any())).willReturn(dto.toEntity());
+//
+//        //when
+//        final ResultActions resultActions = requestSignUp(dto);
+//
+//        //then
+//        resultActions
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.address.address1", is(dto.getAddress().getAddress1())))
+//                .andExpect(jsonPath("$.address.zip", is(dto.getAddress().getZip())))
+//                .andExpect(jsonPath("$.email", is(dto.getEmail())))
+//                .andExpect(jsonPath("$.name.first", is(dto.getName().getFirst())))
+//                .andExpect(jsonPath("$.name.last", is(dto.getName().getLast())));
+//    }
     
     @Test
     @DisplayName("계정조회")

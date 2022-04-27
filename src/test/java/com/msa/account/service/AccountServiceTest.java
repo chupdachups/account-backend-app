@@ -36,20 +36,20 @@ public class AccountServiceTest {
     private AccountRepository accountRepository;
 
 
-    @Test
-    @DisplayName("회원가입 성공")
-    public void create_회원가입_성공() {
-        //given
-        final AccountDto.SignUpReq dto = buildSignUpReq();
-        given(accountRepository.save(any(Account.class))).willReturn(dto.toEntity());
-
-        //when
-        final Account account = accountService.create(dto);
-
-        //then
-        verify(accountRepository, atLeastOnce()).save(any(Account.class));
-        assertThatEqual(dto, account);
-    }
+//    @Test
+//    @DisplayName("회원가입 성공")
+//    public void create_회원가입_성공() {
+//        //given
+//        final AccountDto.SignUpReq dto = buildSignUpReq();
+//        given(accountRepository.save(any(Account.class))).willReturn(dto.toEntity());
+//
+//        //when
+//        final Account account = accountService.create(dto);
+//
+//        //then
+//        verify(accountRepository, atLeastOnce()).save(any(Account.class));
+//        assertThatEqual(dto, account);
+//    }
     
     @Test
     @DisplayName("회원가입 실패 - DuplicateKeyException")

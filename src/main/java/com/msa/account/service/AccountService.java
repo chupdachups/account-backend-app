@@ -1,13 +1,20 @@
 package com.msa.account.service;
 
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.msa.account.dto.AccountDto;
 import com.msa.account.entity.Account;
@@ -15,17 +22,33 @@ import com.msa.account.entity.Role;
 import com.msa.account.exception.AccountNotFoundException;
 import com.msa.account.repository.AccountRepository;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+
 @Service
 @Transactional
+@Slf4j
 public class AccountService {
+	
+	@Value("${my-service.reserve.host}")
+	private String reserveHost;
+	
+	@Value("${my-service.reserve.port}")
+	private String reservePort;
+	
 
 	@Autowired
 	private AccountRepository accountRepository;
 
-	public Account create(AccountDto.SignUpReq dto) {
-		if(!accountRepository.findByEmail(dto.getEmail()).isEmpty())
-			throw new DuplicateKeyException(dto.getEmail());
-	    return accountRepository.save(dto.toEntity(Role.ROLE_USER));
+	public Mono<String> create(AccountDto.SignUpReq dto) {
+		if(!accountRepository.findByEmail(dto.getEmail()).isEmpty()) {
+			throw new DuplicateKeyException(dto.getEmail());			
+		}
+		
+		Account account = accountRepository.save(dto.toEntity(Role.ROLE_USER));
+		
+		return this.sendAccountDataToReserve(account.getId(), account.getEmail());
 	}
 
 	@Transactional(readOnly = true)
@@ -50,5 +73,26 @@ public class AccountService {
 		accountRepository.deleteAllById((Iterable<? extends Long>) dtoList.stream().map(m -> m.getAccountId()).collect(Collectors.toList()));
 	}
 	
+	@SuppressWarnings("unchecked")
+	private Mono<String> sendAccountDataToReserve(long id, String email) {
+		JSONObject jsonReq = new JSONObject();
+		jsonReq.put("id", id);
+		jsonReq.put("email", email);
+
+		HttpClient client = HttpClient.create()
+				  .responseTimeout(Duration.ofSeconds(3));
+		
+		WebClient webClient = WebClient.builder()
+				.baseUrl("http://"+this.reserveHost+":"+this.reservePort)
+				.clientConnector(new ReactorClientHttpConnector(client))
+				.build();
+		
+		return webClient.post()
+				.uri("/account")
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(jsonReq)
+				.retrieve()
+				.bodyToMono(String.class);
+	}
 	
 }
