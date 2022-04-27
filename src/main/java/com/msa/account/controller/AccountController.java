@@ -38,37 +38,5 @@ public class AccountController {
 	@Autowired
     private AccountService accountService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public Mono<String> signUp(@RequestBody @Valid final AccountDto.SignUpReq dto) {
-    	return accountService.create(dto);
-    }
-
-    @RequestMapping(value = "/{email}", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.OK)
-    public AccountDto.Res getAccount(@PathVariable final String email) {
-        return new AccountDto.Res(accountService.findByEmail(email));
-    }
-
-    @RequestMapping(value = "/{email}", method = RequestMethod.PUT)
-    @ResponseStatus(value = HttpStatus.OK)
-    public AccountDto.Res updateMyAccount(@PathVariable final String email, @RequestBody final AccountDto.UpdateAccountReq dto) {
-        return new AccountDto.Res(accountService.updateAccount(email, dto));
-    }
-    
-    @GetMapping
-    @ResponseStatus(value = HttpStatus.OK)
-    public List<AccountDto.Res> getAccounts() {
-    	return accountService.getAccounts().stream()
-    			.map(m -> new AccountDto.Res(m))
-    			.collect(Collectors.toList());
-    }
-    
-    @DeleteMapping
-    @ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<?> deleteAccounts(@RequestBody @Valid final List<AccountDto.DelReq> dtoList) {
-    	accountService.deleteAccounts(dtoList);
-    	return ResponseEntity.ok(true);
-    }
     
 }

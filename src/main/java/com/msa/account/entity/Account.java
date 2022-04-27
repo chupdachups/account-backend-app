@@ -74,7 +74,4 @@ public class Account {
         this.role = role;
     }
 
-    public void updateAccount(AccountDto.UpdateAccountReq dto) {
-        this.address = dto.getAddress();
-    }
 }

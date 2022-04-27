@@ -19,66 +19,6 @@ public class AccountDto {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class SignUpReq {
-    	
-    	@Email
-        private String email;
-    	
-    	@Valid
-    	private Name name;
-    	
-    	@NotBlank
-        private String password;
-    	
-    	@Valid
-    	private Address address;
-    	
-    	private Role role;
-
-        @Builder
-        public SignUpReq(String email, Name name, String password, Address address, String zip, Role role) {
-            this.email = email;
-            this.name = name;
-            this.password = password;
-            this.address = address;
-            this.role = role;
-        }
-
-        public Account toEntity() {
-            return Account.builder()
-                    .email(this.email)
-                    .name(this.name)
-                    .password(this.password)
-                    .address(this.address)
-                    .role(this.role)
-                    .build();
-        }
-        public Account toEntity(Role role) {
-            return Account.builder()
-                    .email(this.email)
-                    .name(this.name)
-                    .password(this.password)
-                    .address(this.address)
-                    .role(role)
-                    .build();
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UpdateAccountReq {
-    	
-        @Valid
-    	private Address address;
-
-        @Builder
-        public UpdateAccountReq(Address address, String zip) {
-            this.address = address;
-        }
-    }
-    
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class LoginReq {
     	
     	@Email
@@ -112,16 +52,4 @@ public class AccountDto {
         }
     }
     
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class DelReq {
-    	private Long accountId;
-    	
-    	@Builder
-    	public DelReq(long accountId) {
-    		this.accountId = accountId;
-    		
-    	}
-    	
-    }
 }
