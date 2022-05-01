@@ -41,6 +41,7 @@ public class AccountController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
     public Mono<String> signUp(@RequestBody @Valid final AccountDto.SignUpReq dto) {
+    	log.info("test");
     	return accountService.create(dto);
     }
 
