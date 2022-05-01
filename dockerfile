@@ -9,3 +9,6 @@ ENTRYPOINT ["java", "-jar"]
 CMD ["account.jar"]
 
 EXPOSE 8070
+
+
+
