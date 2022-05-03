@@ -7,11 +7,8 @@ import java.util.stream.Collectors;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,15 +28,11 @@ import reactor.netty.http.client.HttpClient;
 @Slf4j
 public class AccountService {
 	
-	@Value("${my-service.reserve.host}")
-	private String reserveHost;
-	
-	@Value("${my-service.reserve.port}")
-	private String reservePort;
-	
-
 	@Autowired
 	private AccountRepository accountRepository;
+	
+	@Autowired
+	private WebClient webClient;
 
 	public Mono<String> create(AccountDto.SignUpReq dto) {
 		if(!accountRepository.findByEmail(dto.getEmail()).isEmpty()) {
@@ -77,17 +70,9 @@ public class AccountService {
 	private Mono<String> sendAccountDataToReserve(long id, String email) {
 		JSONObject jsonReq = new JSONObject();
 		jsonReq.put("id", id);
-		jsonReq.put("email", email);
-
-		HttpClient client = HttpClient.create()
-				  .responseTimeout(Duration.ofSeconds(3));
+		jsonReq.put("email", email);;
 		
-		WebClient webClient = WebClient.builder()
-				.baseUrl("http://"+this.reserveHost+":"+this.reservePort)
-				.clientConnector(new ReactorClientHttpConnector(client))
-				.build();
-		
-		return webClient.post()
+		return this.webClient.post()
 				.uri("/account")
 				.accept(MediaType.APPLICATION_JSON)
 				.bodyValue(jsonReq)
