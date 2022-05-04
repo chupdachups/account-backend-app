@@ -1,0 +1,7 @@
+my-service:
+  product:
+    host: product-service.msa-class.svc.cluster.local
+    port: 8071
+  reserve:
+    host: reserve-service.msa-class.svc.cluster.local
+    port: 8072
